@@ -6,7 +6,7 @@ rm bikes.tar.gz
 
 wget 'http://www.robots.ox.ac.uk/~vgg/research/affine/det_eval_files/graf.tar.gz' && /
 mkdir graf && /
-tar -xzf trees.tar.gz -C graf && /
+tar -xzf graf.tar.gz -C graf && /
 rm graf.tar.gz
 
 wget 'http://www.robots.ox.ac.uk/~vgg/research/affine/det_eval_files/trees.tar.gz' && /

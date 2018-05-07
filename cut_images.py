@@ -58,7 +58,7 @@ def make_samples(set_name, points):
                     break
                 if y_from < 0 or y_to > img.shape[0]:
                     break
-                sample = img[y_from:y_to, x_from:x_to]
+                sample = img[int(y_from):int(y_to), int(x_from):int(x_to)]
                 samples.append(sample)
                 samples_points.append(coord_to_dict(str(uuid.uuid4()) if sample_idx == 1 else first_id,
                                                     set_name,
