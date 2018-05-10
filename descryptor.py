@@ -4,14 +4,23 @@ import cv2
 import numpy as np
 
 
+def cut_circle(img):
+    w, h = img.shape
+    a, b = w / 2, h / 2
+    n = min(w, h)
+    y, x = np.ogrid[-a:n - a, -b:n - b]
+    mask = x * x + y * y <= n*n/4
+    img[~mask] = 0
+
+
 def extract(img, points):
-    # return hu_extract(img, points)
-    return sift_extract(img, points)
+    return hu_extract(img, points)
+    # return sift_extract(img, points)
 
 
 def distance(des1, des2):
-    # return hu_distance(des1, des2)
-    return sift_distance(des1, des2)
+    return hu_distance(des1, des2)
+    # return sift_distance(des1, des2)
 
 
 def sift_extract(img, points):
@@ -71,6 +80,7 @@ def normalise_image(img):
 
 def get_sample(img, x, y, r=32, normalize=True):
     sample = img[y - r:y + r, x - r:x + r]
+    sample = cut_circle(sample)
     if normalize:
         sample = normalise_image(sample)
     return sample
