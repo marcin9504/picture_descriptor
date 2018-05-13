@@ -2,6 +2,8 @@ import math
 
 import cv2
 import numpy as np
+import math
+from scipy.stats.stats import pearsonr
 
 
 def cut_circle(img):
@@ -9,18 +11,53 @@ def cut_circle(img):
     a, b = w / 2, h / 2
     n = min(w, h)
     y, x = np.ogrid[-a:n - a, -b:n - b]
-    mask = x * x + y * y <= n*n/4
+    mask = x * x + y * y <= n * n / 4
     img[~mask] = 0
+    return img
 
 
 def extract(img, points):
-    return hu_extract(img, points)
+    return circle_hist_extract(img, points)
+    # return hu_extract(img, points)
     # return sift_extract(img, points)
 
 
 def distance(des1, des2):
-    return hu_distance(des1, des2)
+    return circle_hist_distance(des1, des2)
+    # return hu_distance(des1, des2)
     # return sift_distance(des1, des2)
+
+
+def circle_hist_extract(img, points):
+    descriptors = []
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    for point in points:
+        y, x = point
+        sample = get_sample(img, x, y)
+        w, h = sample.shape
+        dict = {}
+        normalise_count = {}
+        center_x, center_y = w // 2, h // 2
+
+        for i in range(w):
+            for j in range(h):
+                key = math.floor(math.sqrt((i - center_x) ** 2 + (j - center_y) ** 2))
+                val = dict.get(key, 0)
+                count_val = normalise_count.get(key, 0)
+                dict[key] = val + img[i, j]
+                normalise_count[key] = count_val + 1
+
+        des = [0 for i in range(len(dict))]
+        for key, value in normalise_count.items():
+            des[key] = dict[key] / value
+
+        descriptors.append(des)
+        # print(des)
+    return descriptors
+
+
+def circle_hist_distance(des1, des2):
+    return abs(pearsonr(des1, des2)[0])
 
 
 def sift_extract(img, points):
