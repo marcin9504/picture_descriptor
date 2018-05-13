@@ -35,54 +35,43 @@ def circle_hist_extract(img, points):
         y, x = point
         sample = get_sample(img, x, y)
         w, h = sample.shape
-        dict = {}
+        dict_brightness = {}
         normalise_count = {}
         center_x, center_y = w // 2, h // 2
 
         for i in range(w):
             for j in range(h):
                 key = math.floor(math.sqrt((i - center_x) ** 2 + (j - center_y) ** 2))
-                val = dict.get(key, 0)
+                val = dict_brightness.get(key, 0)
                 count_val = normalise_count.get(key, 0)
-                dict[key] = val + img[i, j]
+                dict_brightness[key] = val + img[i, j]
                 normalise_count[key] = count_val + 1
 
-        des = [0 for i in range(len(dict))]
+        des = [0 for _ in range(len(dict_brightness))]
         for key, value in normalise_count.items():
-            des[key] = dict[key] / value
+            des[key] = dict_brightness[key] / value
 
         descriptors.append(des)
         # print(des)
     return descriptors
 
 
+def rescale(vector, length):
+    r = length
+    split_arr = np.linspace(0, len(vector), num=r + 1, dtype=int)
+    dwnsmpl_subarr = np.split(vector, split_arr[1:])
+    dwnsmpl_arr = (list(np.mean(item) for item in dwnsmpl_subarr[:-1]))
+    return dwnsmpl_arr
+
+
 def circle_hist_distance(des1, des2):
-    return abs(pearsonr(des1, des2)[0])
-
-
-def sift_extract(img, points):
-    descriptors = []
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    sift = cv2.xfeatures2d.SIFT_create(400)
-    for point in points:
-        y, x = point
-        sample = get_sample(img, x, y)
-        kp, des = sift.detectAndCompute(sample, None)
-        descriptors.append(des)
-    return descriptors
-
-
-def sift_distance(des1, des2):
-    threshold = 1 / 30
-    if des1 is None or des2 is None:
-        print("None")
-        return 1
-    bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
-    matches = bf.match(des1, des2)
-    # for match in matches:
-    #     print(match.distance)
-    # matches = sorted(matches, key=lambda x: x.distance)
-    return float(threshold) / len(matches)
+    # return abs(pearsonr(des1, des2)[0])
+    corr = []
+    for scale in (0.7, 0.8, 0.9, 1):
+        rescaled_length = math.floor(len(des1) * scale)
+        corr.append(abs(pearsonr(des1[:rescaled_length], rescale(des2, rescaled_length))[0]))
+        corr.append(abs(pearsonr(des2[:rescaled_length], rescale(des1, rescaled_length))[0]))
+    return max(corr)
 
 
 def hu_distance(des1, des2):
