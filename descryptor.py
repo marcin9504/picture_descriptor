@@ -21,6 +21,7 @@ def extract(img, points):
     des = []
     des.append(circle_hist_extract(img, points))
     des.append(hu_extract(img, points))
+    des.append(average_extract(img, points))
     return des
 
 
@@ -29,12 +30,29 @@ def distance(des1, des2):
     scores = []
     scores.append(circle_hist_distance(des1[0], des2[0]))
     scores.append(hu_distance(des1[1], des2[1]))
+    scores.append(average_distance(des1[2], des2[2]))
 
     for idx, d in enumerate(scores):
         if d not in range(0, 1):
             scores[idx] = 0.5
 
     return sum(scores) / float(len(scores))
+
+
+def average_extract(img, points):
+    descriptors = []
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    for point in points:
+        y, x = point
+        sample = get_sample(img, x, y)
+        des = np.average(sample[sample > 0])
+        descriptors.append(des)
+    return descriptors
+
+
+def average_distance(des1, des2):
+    threshold = 64
+    return min(1, abs(des1 - des2) / threshold)
 
 
 def circle_hist_extract(img, points):
