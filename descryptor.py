@@ -53,7 +53,7 @@ def circle_hist_extract(img, points):
                 key = math.floor(math.sqrt((i - center_x) ** 2 + (j - center_y) ** 2))
                 val = dict_brightness.get(key, 0)
                 count_val = normalise_count.get(key, 0)
-                dict_brightness[key] = val + img[i, j]
+                dict_brightness[key] = val + sample[i, j]
                 normalise_count[key] = count_val + 1
 
         des = [0 for _ in range(len(dict_brightness))]
