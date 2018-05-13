@@ -17,15 +17,24 @@ def cut_circle(img):
 
 
 def extract(img, points):
-    return circle_hist_extract(img, points)
-    # return hu_extract(img, points)
-    # return sift_extract(img, points)
+    # return circle_hist_extract(img, points) #uncomment it to use only one method
+    des = []
+    des.append(circle_hist_extract(img, points))
+    des.append(hu_extract(img, points))
+    return des
 
 
 def distance(des1, des2):
-    return circle_hist_distance(des1, des2)
-    # return hu_distance(des1, des2)
-    # return sift_distance(des1, des2)
+    # return circle_hist_distance(des1,des2) #uncomment it to use only one method
+    scores = []
+    scores.append(circle_hist_distance(des1[0], des2[0]))
+    scores.append(hu_distance(des1[1], des2[1]))
+
+    for idx, d in enumerate(scores):
+        if d not in range(0, 1):
+            scores[idx] = 0.5
+
+    return sum(scores) / float(len(scores))
 
 
 def circle_hist_extract(img, points):
@@ -71,7 +80,10 @@ def circle_hist_distance(des1, des2):
         rescaled_length = math.floor(len(des1) * scale)
         corr.append(abs(pearsonr(des1[:rescaled_length], rescale(des2, rescaled_length))[0]))
         corr.append(abs(pearsonr(des2[:rescaled_length], rescale(des1, rescaled_length))[0]))
-    return max(corr)
+    if np.isnan(max(corr)):
+        return 0.5
+    else:
+        return max(corr)
 
 
 def hu_distance(des1, des2):
