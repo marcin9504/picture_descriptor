@@ -4,9 +4,10 @@ import random
 import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 import descryptor
+import roc_plot
 
 
 def get_file_name(file):
@@ -16,8 +17,8 @@ def get_file_name(file):
 def main():
     all_points = pd.read_json('points.json')
     img_class = random.choice(all_points['class'].unique())
-    points = all_points[all_points['class'] == img_class].sample(2)
-    points = points.append(all_points[all_points['class'] != img_class].sample(4))
+    points = all_points[all_points['class'] == img_class]
+    points = points.append(all_points[all_points['class'] != img_class].sample(6))
     images = {}
     for idx, point in points.iterrows():
         if (point['set'], point['file']) not in images:
@@ -26,17 +27,18 @@ def main():
     for idx, point in points.iterrows():
         x = point['pos']['x']
         y = point['pos']['y']
-        descriptors += descryptor.extract(images[(point['set'], point['file'])], [[y, x]])
+        descriptors.extend(descryptor.extract(images[(point['set'], point['file'])], [[y, x]]))
     y_scores = []
-    print(descriptors)
-    for des in descriptors:
-        y_scores.append(descryptor.distance(descriptors[0], des))
+    y_true = []
+    for i, des1 in enumerate(descriptors):
+        for j, des2 in enumerate(descriptors):
+            y_scores.append(descryptor.distance(des1, des2))
+            y_true.append(0 if points.iloc[i]['class'] == points.iloc[j]['class'] else 1)
 
-    print(y_scores)
-    score = roc_auc_score((points['class'] == img_class).astype(int), y_scores)
-    print(score)
-    plt.plot(score)
-    plt.show()
+    for y_t, y_s in zip(y_true, y_scores):
+        print(y_t, y_s)
+    roc_plot.draw(y_true, y_scores)
+
 
 
 if __name__ == '__main__':

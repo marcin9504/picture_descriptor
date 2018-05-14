@@ -28,7 +28,7 @@ def coord_to_dict(pos_id, set_name, file, x, y, origin, coord_class):
 
 def make_samples(set_name, points):
     img_names = get_files(set_name, 'png')
-    sample_size = 100
+    sample_size = 64
     rows, cols, channels = cv2.imread(img_names[0]).shape
     samples_num = 10
     for sample_num in range(samples_num):
