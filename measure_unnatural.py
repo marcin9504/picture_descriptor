@@ -131,6 +131,7 @@ def main():
             else:
                 y_true.append(1)
             y_score.append(descryptor.distance(d1, d2))
+            print(f'\r {i*len(des)+j} out of {len(des)**2}', end='')
 
     # for y_t, y_s in zip(y_true, y_score):
     #     print(y_t, y_s)

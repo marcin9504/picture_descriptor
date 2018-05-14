@@ -2,9 +2,7 @@ import os
 import random
 
 import cv2
-import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 import descryptor
 import roc_plot
@@ -38,7 +36,6 @@ def main():
     for y_t, y_s in zip(y_true, y_scores):
         print(y_t, y_s)
     roc_plot.draw(y_true, y_scores)
-
 
 
 if __name__ == '__main__':
