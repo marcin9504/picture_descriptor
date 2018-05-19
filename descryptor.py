@@ -6,16 +6,7 @@ import numpy as np
 from scipy.stats.stats import pearsonr
 
 from brief import Brief
-
-
-def cut_circle(img):
-    w, h = img.shape
-    a, b = w / 2, h / 2
-    n = min(w, h)
-    y, x = np.ogrid[-a:n - a, -b:n - b]
-    mask = x * x + y * y <= n * n / 4
-    img[~mask] = 0
-    return img
+from util import get_sample
 
 
 class Descriptor(dict):
@@ -28,7 +19,6 @@ class Descriptor(dict):
 brief = None
 
 def extract(img, points):
-    # return circle_hist_extract(img, points) #uncomment it to use only one method
     global brief
     if brief is None:
         brief = Brief(512, 32)
@@ -39,20 +29,19 @@ def extract(img, points):
         # des[Descriptor.CIRCLE_HIST] = circle_hist_extract(img, point)
         # des[Descriptor.HU_MOMENTS] = hu_extract(img, point)
         # des[Descriptor.AVERAGE] = average_extract(img, point)
-        des[Descriptor.MAX_ON_CIRCLE] = max_on_circle_extract(img, point)
+        # des[Descriptor.MAX_ON_CIRCLE] = max_on_circle_extract(img, point)
         des[Descriptor.BRIEF] = brief.extract(img, point)
         descryptors.append(des)
     return descryptors
 
 
 def distance(des1, des2):
-    # return circle_hist_distance(des1,des2) #uncomment it to use only one method
     scores = []
     # scores.append(circle_hist_distance(des1[Descriptor.CIRCLE_HIST], des2[Descriptor.CIRCLE_HIST]))
     # scores.append(hu_distance(des1[Descriptor.HU_MOMENTS], des2[Descriptor.HU_MOMENTS]))
     # scores.append(average_distance(des1[Descriptor.AVERAGE], des2[Descriptor.AVERAGE]))
     # scores.append(max_on_circle_distance(des1[Descriptor.MAX_ON_CIRCLE], des2[Descriptor.MAX_ON_CIRCLE]))
-    scores.append(Brief.compare(des1[Descriptor.BRIEF], des2[Descriptor.BRIEF]))
+    scores.append(brief.compare(des1[Descriptor.BRIEF], des2[Descriptor.BRIEF]))
     # for idx, d in enumerate(scores):
     #     if d not in range(0, 1):
     #         scores[idx] = 0.5
@@ -140,7 +129,7 @@ def circle_hist_extract(img, point):
     des = np.zeros(len(dict_brightness))
     for key, value in normalise_count.items():
         des[key] = dict_brightness[key] / value
-    return des
+    return des[:32]
 
 
 def rescale(vector, length):
@@ -152,7 +141,6 @@ def rescale(vector, length):
 
 
 def circle_hist_distance(des1, des2):
-    # return abs(pearsonr(des1, des2)[0])
     corr = []
     for scale in (0.7, 0.8, 0.9, 1, 0.5, 0.6, 0.25):
         rescaled_length = math.floor(len(des1) * scale)
@@ -177,24 +165,3 @@ def hu_extract(img, point):
     return des
 
 
-def normalise_image(img):
-    return cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX)
-
-
-def get_sample(img, x, y, r=32, normalize=True):
-    sample = img[y - r:y + r, x - r:x + r]
-    sample = cut_circle(sample)
-    if normalize:
-        sample = normalise_image(sample)
-    return sample
-
-
-def sign(x):
-    if x > 0:
-        return 1.
-    elif x < 0:
-        return -1.
-    elif x == 0:
-        return 0.
-    else:
-        return x

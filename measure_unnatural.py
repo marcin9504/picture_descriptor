@@ -9,7 +9,7 @@ import os
 
 import descryptor
 
-SAMPLE_SIZE = 64
+SAMPLE_SIZE = 128
 SAMPLES_NUM = 200
 
 
@@ -64,8 +64,10 @@ def random_transformation(img):
              (rotate, range(0, 91, 15)),
              (view_point, range(0, 55, 7)),
              (zoom, [0.5, 1.2, 1.5, 2, 4]),
+             (zoom, [0.5]),
              (gamma, [0.5, 0.6, 0.75, 1.2, 1.5, 1.7]),
-             (jpg_compress, [5, 10, 30, 55, 80])]
+             (jpg_compress, [5, 10, 30, 55, 80])
+             ]
     f, val = random.choice(trans)
     return f(img, random.choice(val))
 
@@ -79,17 +81,19 @@ def save_samples(samples):
 
 
 def main():
-    orginal_set = 'graf'
+    # np.random.seed(56)
+    # random.seed(56)
+    orginal_set = 'bikes'
     img = cv2.imread(os.path.join(orginal_set, 'img1.ppm'))
     orginal_samples = []
-    orginal = random_sample(img, SAMPLE_SIZE * 2)
+    orginal = random_sample(img, SAMPLE_SIZE)
     for rot in range(0, 91, 15):
         orginal_samples.append(rotate(orginal, rot))
     for rot in range(0, 55, 7):
         orginal_samples.append(view_point(orginal, rot))
     for kernel_size in range(5, 21, 4):
         orginal_samples.append(blur(orginal, kernel_size))
-    for scale in [0.5, 1.2, 1.5, 2, 4]:
+    for scale in [0.5, 0.7, 0.8, 1.2, 1.5, 2, 3, 4, 5]:
         orginal_samples.append(zoom(orginal, scale))
     for g in [0.5, 0.6, 0.75, 1.2, 1.5, 1.7]:
         orginal_samples.append(gamma(orginal, g))
@@ -104,16 +108,16 @@ def main():
         ('ubc', 'ppm'),
         ('wall', 'ppm')
     ]
-    used_set = sets[0] # samples used from one set
+    used_set = sets[0]  # samples used from one set
     # sets = filter(lambda x: x[0] != original_set, sets)
     images = [f'img{i+1}' for i in range(6)]
     other_samples = []
     for _ in range(len(orginal_samples)):
-        # rand_set = random.choice(sets)
+        rand_set = random.choice(sets)
         rand_set = used_set
         rand_img = random.choice(images)
         rand_img = cv2.imread(os.path.join(rand_set[0], f'{rand_img}.{rand_set[1]}'))
-        rand_img = random_sample(rand_img, SAMPLE_SIZE * 2)
+        rand_img = random_sample(rand_img, SAMPLE_SIZE)
         rand_img = random_transformation(rand_img)
         other_samples.append(rand_img)
     # save_samples(orginal_samples + other_samples)
@@ -121,10 +125,11 @@ def main():
     y_true = []
     y_score = []
     des = []
-    sample_center = [[int(SAMPLE_SIZE / 2)] * 2]
     for sample in orginal_samples:
+        sample_center = [[int(sample.shape[0] / 2)] * 2]
         des.append(descryptor.extract(sample, sample_center)[0])
     for sample in other_samples:
+        sample_center = [[int(sample.shape[0] / 2)] * 2]
         des.append(descryptor.extract(sample, sample_center)[0])
     for i, d1 in enumerate(des):
         for j, d2 in enumerate(des):

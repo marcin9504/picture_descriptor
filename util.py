@@ -1,5 +1,6 @@
 from math import pi
 import cv2
+import numpy as np
 
 """ Utility Functions """
 
@@ -33,4 +34,32 @@ def deg_to_rad(deg):
 
 
 def rad_to_deg(rad):
-    return deg * 180.0 / pi
+    return rad * 180.0 / pi
+
+
+def rotate(img, deg):
+    rows, cols = img.shape
+    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), deg, 1)
+    return cv2.warpAffine(img, M, (cols, rows))
+
+
+def cut_circle(img):
+    w, h = img.shape
+    a, b = w / 2, h / 2
+    r = min(w, h)
+    y, x = np.ogrid[-a:r - a, -b:r - b]
+    mask = x * x + y * y <= r * r / 4
+    img[~mask] = 0
+    return img
+
+
+def get_sample(img, x, y, r=32, normalize=True):
+    sample = img[y - r:y + r, x - r:x + r]
+    sample = cut_circle(sample)
+    if normalize:
+        sample = normalise_image(sample)
+    return sample
+
+
+def normalise_image(img):
+    return cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX)
