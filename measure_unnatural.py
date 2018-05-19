@@ -104,11 +104,13 @@ def main():
         ('ubc', 'ppm'),
         ('wall', 'ppm')
     ]
-    # sets = filter(lambda x: x[0] != orginal_set, sets)
+    used_set = sets[0] # samples used from one set
+    # sets = filter(lambda x: x[0] != original_set, sets)
     images = [f'img{i+1}' for i in range(6)]
     other_samples = []
     for _ in range(len(orginal_samples)):
-        rand_set = random.choice(sets)
+        # rand_set = random.choice(sets)
+        rand_set = used_set
         rand_img = random.choice(images)
         rand_img = cv2.imread(os.path.join(rand_set[0], f'{rand_img}.{rand_set[1]}'))
         rand_img = random_sample(rand_img, SAMPLE_SIZE * 2)
@@ -132,7 +134,7 @@ def main():
                 y_true.append(1)
             y_score.append(descryptor.distance(d1, d2))
             print(f'\r {i*len(des)+j} out of {len(des)**2}', end='')
-
+    print()
     # for y_t, y_s in zip(y_true, y_score):
     #     print(y_t, y_s)
     roc_plot.draw(y_true, y_score)
