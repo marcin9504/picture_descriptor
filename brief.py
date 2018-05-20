@@ -25,7 +25,6 @@ class Brief(object):
 
     def extract(self, img, point):
         y, x = point
-        # hist = self.circle_hist_extract(img, point)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = get_sample(img, y, x, normalize=False)
         angle = self.extract_dominant_gradient(img)
@@ -43,9 +42,6 @@ class Brief(object):
 
     def compare(self, des1, des2):
         return hamming(des1, des2) / self.points_num
-
-    def reject_outliers(data, m=2):
-        return data[abs(data - np.mean(data)) < m * np.std(data)]
 
     def extract_dominant_gradient(self, img):
         img = img.astype(np.float32)
@@ -88,4 +84,3 @@ if __name__ == '__main__':
     img = cv2.imread('rotated.png')
     des2 = b.extract(img, (32, 32))
     print(b.compare(des1, des2))
-   

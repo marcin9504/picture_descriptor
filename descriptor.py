@@ -29,7 +29,7 @@ def extract(img, points):
     for point in points:
         des = Descriptor()
         # des[Descriptor.CIRCLE_HIST] = circle_hist_extract(img, point)
-        des[Descriptor.HU_MOMENTS] = hu_extract(img, point)
+        # des[Descriptor.HU_MOMENTS] = hu_extract(img, point)
         des[Descriptor.AVERAGE] = average_extract(img, point)
         # des[Descriptor.MAX_ON_CIRCLE] = max_on_circle_extract(img, point)
         des[Descriptor.BRIEF] = brief.extract(img, point)
@@ -40,13 +40,10 @@ def extract(img, points):
 def distance(des1, des2):
     scores = []
     # scores.append(circle_hist_distance(des1[Descriptor.CIRCLE_HIST], des2[Descriptor.CIRCLE_HIST]))
-    scores.append(hu_distance(des1[Descriptor.HU_MOMENTS], des2[Descriptor.HU_MOMENTS]))
+    # scores.append(hu_distance(des1[Descriptor.HU_MOMENTS], des2[Descriptor.HU_MOMENTS]))
     scores.append(average_distance(des1[Descriptor.AVERAGE], des2[Descriptor.AVERAGE]))
     # scores.append(max_on_circle_distance(des1[Descriptor.MAX_ON_CIRCLE], des2[Descriptor.MAX_ON_CIRCLE]))
     scores.append(brief.compare(des1[Descriptor.BRIEF], des2[Descriptor.BRIEF]))
-    # for idx, d in enumerate(scores):
-    #     if d not in range(0, 1):
-    #         scores[idx] = 0.5
 
     return sum(scores) / float(len(scores))
 
@@ -97,7 +94,7 @@ def max_on_circle_distance(des1, des2):
     if np.isnan(np.max(corr)):
         return 0.5
     else:
-        return 1-np.max(corr)
+        return 1 - np.max(corr)
 
 
 def average_extract(img, point):
@@ -148,7 +145,7 @@ def circle_hist_distance(des1, des2):
         rescaled_length = math.floor(len(des1) * scale)
         corr.append(abs(pearsonr(des1[:rescaled_length], rescale(des2, rescaled_length))[0]))
         corr.append(abs(pearsonr(des2[:rescaled_length], rescale(des1, rescaled_length))[0]))
-    return 1-max(corr)
+    return 1 - max(corr)
 
 
 max_diff = 0
@@ -163,7 +160,7 @@ def hu_distance(des1, des2):
 
 
 def hu_extract(img, point):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)/256
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) / 256
     y, x = point
     sample = get_sample(img, x, y)
     des = cv2.HuMoments(cv2.moments(sample))
@@ -181,4 +178,3 @@ if __name__ == '__main__':
     img2 = (np.random.rand(64, 64) * 256).astype(np.uint16)
     des1 = hu_extract(img1, (32, 32))
     des2 = hu_extract(img2, (32, 32))
-    print(hu_distance(des1, des2))
