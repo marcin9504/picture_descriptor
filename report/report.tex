@@ -10,6 +10,7 @@
 \useunder{\uline}{\ul}{}
 \usepackage{float}
 %\usepackage[margin=0.6in]{geometry}
+\usepackage{graphicx}
 \usepackage{multicol}
 \lstset{showstringspaces=false}
 
@@ -43,6 +44,16 @@ Porównanie deskryptorów polegało badaniu zależności między wyznaczonymi ś
 
 $$ min(1, \frac{|des_1 - des_2|}{64}) $$
 
+\subsection{Wynik działania}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./img/average.png}
+\end{center}
+\caption{Wynik działania deskryptora, AUC.}
+\end{figure}
+
+
 \subsection{Momenty Hu}
 
 \subsubsection{Ekstrakcja}
@@ -50,11 +61,20 @@ Metoda polegała na wyznaczeniu momentów Hu z otoczenia punktu.
 
 \subsubsection{Porównanie}
 Najpierw wyznaczono dla każdego momentu wartości:
-$$ v_i = -sgn(h_i) * log_{10}|h_i|), $$
+$$ v_i = -sgn(h_i) * log_{10}|h_i|, $$
 gdzie $h_i$ oznacza $i$-ty moment Hu, a $sgn(x)$ -- znak liczby $x$.
 Następnie porównano dwa wektory $v$ oraz $w$zgodnie ze wzorem:
 
 $$ \sum_{i=1}^{7}|v_i - w_i|$$
+
+\subsection{Wynik działania}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./img/hu.png}
+\end{center}
+\caption{Wynik działania deskryptora, AUC.}
+\end{figure}
 
 \subsection{Średnie jasności na okręgach}
 
@@ -66,7 +86,18 @@ W ten sposób otrzymano wektor o długości $33$.
 Dla każdego z współczynników: $a = 0.7, 0.8, 0.9, 1, \frac{1}{0.7}, \frac{1}{0.8}, \frac{1}{0.9}$, wykonywano następujące czynności.
 Porównywano pierwsze $\left \lfloor  a \cdot 33 \right \rfloor$ elementów pierwszego wektora oraz tyle samo elementów drugiego wektora. Aby uzyskać odpowiednią długość drugiego wektora dokonywano operacji analogicznej do decymacji w cyfrowym przetwarzaniu sygnałów.
 Dzięki temu deskryptor był odporny na skalowanie.
-Porównanie dwóch wektorów polegało na wyznaczeniu korelacji między dwoma wektorami oraz wybranie maksymalnej z wyznaczonych wartości.
+Porównanie dwóch wektorów polegało na wyznaczeniu korelacji ($c_i$) między dwoma wektorami oraz wybranie maksymalnej z wyznaczonych wartości i odjęcie jej od $1$:
+
+$$ 1-max(c) $$
+
+\subsection{Wynik działania}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./img/circle_hist.png}
+\end{center}
+\caption{Wynik działania deskryptora, AUC.}
+\end{figure}
 
 \subsection{Maksymalne jasności na okręgach}
 
@@ -78,6 +109,17 @@ W ten sposób otrzymano wektor o długości $33$.
 \subsubsection{Porównanie}
 Dla każdego z współczynników: $\alpha = 0, \frac{\pi}{36}, \frac{2\pi}{36},...\frac{17\pi}{36}$, zwiększano każdą z wartości pierwszego wektora o $\alpha$ oraz porównywano otrzymane wektory w taki sam sposób jak w poprzedniej metodzie, z tą różnicą, że jako ostateczną wartość brano maksymalną wartość bezwzględną z korelacji między wektorami.
 
+
+\subsection{Wynik działania}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./img/max_on_circle.png}
+\end{center}
+\caption{Wynik działania deskryptora, AUC.}
+\end{figure}
+
+
 \subsection{Porównanie jasnoilościowych punktów}
 
 \section{Ekstrakcja}
@@ -87,6 +129,16 @@ Następnie dla każdego obrazu są porównywane punkty a dokładniej ich jasnoś
 
 \subsection{Porównanie}
 Porównywanie obrazów odbywa się przy pomocy odległości Hamminga.
+
+
+\subsection{Wynik działania}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./img/brief.png}
+\end{center}
+\caption{Wynik działania deskryptora, AUC.}
+\end{figure}
 
 \section{Testowanie}
 Aby móc dobrze ocenić działanie deskryptora zostały napisane dwa skrypty umożliwiające sprawdzenie jakości naszego rozwiązania. Pierwszy używa prawdziwych zdjęć z podanego zbioru losując punkty i zapisując ich współrzędne wraz z odpowiadającymi im punktami w odpowiadających zdjęciach. Drugi zaś wybiera losowy fragment i poddaje go transformacją:
