@@ -4,7 +4,7 @@ import random
 import cv2
 import numpy as np
 
-import descryptor
+import descriptor
 from image_transformaer import ImageTransformer
 
 SAMPLE_SIZE = 128
@@ -125,17 +125,17 @@ def main():
     des = []
     for sample in orginal_samples:
         sample_center = [[int(sample.shape[0] / 2)] * 2]
-        des.append(descryptor.extract(sample, sample_center)[0])
+        des.append(descriptor.extract(sample, sample_center)[0])
     for sample in other_samples:
         sample_center = [[int(sample.shape[0] / 2)] * 2]
-        des.append(descryptor.extract(sample, sample_center)[0])
+        des.append(descriptor.extract(sample, sample_center)[0])
     for i, d1 in enumerate(des):
         for j, d2 in enumerate(des):
             if i < len(des) / 2 and j < len(des) / 2:
                 y_true.append(0)
             else:
                 y_true.append(1)
-            y_score.append(descryptor.distance(d1, d2))
+            y_score.append(descriptor.distance(d1, d2))
             # print(f'\r {i*len(des)+j} out of {len(des)**2}', end='')
     print(y_score)
     # for y_t, y_s in zip(y_true, y_score):

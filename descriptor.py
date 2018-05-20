@@ -29,8 +29,8 @@ def extract(img, points):
     for point in points:
         des = Descriptor()
         # des[Descriptor.CIRCLE_HIST] = circle_hist_extract(img, point)
-        # des[Descriptor.HU_MOMENTS] = hu_extract(img, point)
-        # des[Descriptor.AVERAGE] = average_extract(img, point)
+        des[Descriptor.HU_MOMENTS] = hu_extract(img, point)
+        des[Descriptor.AVERAGE] = average_extract(img, point)
         # des[Descriptor.MAX_ON_CIRCLE] = max_on_circle_extract(img, point)
         des[Descriptor.BRIEF] = brief.extract(img, point)
         descryptors.append(des)
@@ -40,8 +40,8 @@ def extract(img, points):
 def distance(des1, des2):
     scores = []
     # scores.append(circle_hist_distance(des1[Descriptor.CIRCLE_HIST], des2[Descriptor.CIRCLE_HIST]))
-    # scores.append(hu_distance(des1[Descriptor.HU_MOMENTS], des2[Descriptor.HU_MOMENTS]))
-    # scores.append(average_distance(des1[Descriptor.AVERAGE], des2[Descriptor.AVERAGE]))
+    scores.append(hu_distance(des1[Descriptor.HU_MOMENTS], des2[Descriptor.HU_MOMENTS]))
+    scores.append(average_distance(des1[Descriptor.AVERAGE], des2[Descriptor.AVERAGE]))
     # scores.append(max_on_circle_distance(des1[Descriptor.MAX_ON_CIRCLE], des2[Descriptor.MAX_ON_CIRCLE]))
     scores.append(brief.compare(des1[Descriptor.BRIEF], des2[Descriptor.BRIEF]))
     # for idx, d in enumerate(scores):

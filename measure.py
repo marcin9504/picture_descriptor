@@ -4,7 +4,7 @@ import random
 import cv2
 import pandas as pd
 
-import descryptor
+import descriptor
 import roc_plot
 
 
@@ -13,10 +13,11 @@ def get_file_name(file):
 
 
 def main():
+    random.seed(3)
     all_points = pd.read_json('points.json')
     img_class = random.choice(all_points['class'].unique())
     points = all_points[all_points['class'] == img_class]
-    points = points.append(all_points[all_points['class'] != img_class].sample(6))
+    points = points.append(all_points[all_points['class'] != img_class].sample(30))
     images = {}
     for idx, point in points.iterrows():
         if (point['set'], point['file']) not in images:
@@ -25,12 +26,12 @@ def main():
     for idx, point in points.iterrows():
         x = point['pos']['x']
         y = point['pos']['y']
-        descriptors.extend(descryptor.extract(images[(point['set'], point['file'])], [[y, x]]))
+        descriptors.extend(descriptor.extract(images[(point['set'], point['file'])], [[y, x]]))
     y_scores = []
     y_true = []
     for i, des1 in enumerate(descriptors):
         for j, des2 in enumerate(descriptors):
-            y_scores.append(descryptor.distance(des1, des2))
+            y_scores.append(descriptor.distance(des1, des2))
             y_true.append(0 if points.iloc[i]['class'] == points.iloc[j]['class'] else 1)
 
     for y_t, y_s in zip(y_true, y_scores):
