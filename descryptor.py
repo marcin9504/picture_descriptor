@@ -16,7 +16,9 @@ class Descriptor(dict):
     MAX_ON_CIRCLE = 'max_on_circle'
     BRIEF = 'brief'
 
+
 brief = None
+
 
 def extract(img, points):
     global brief
@@ -149,12 +151,15 @@ def circle_hist_distance(des1, des2):
     return max(corr)
 
 
+max_diff = 0
+
+
 def hu_distance(des1, des2):
     des1 = -np.sign(des1) * np.log10(np.abs(des1))
     des2 = -np.sign(des2) * np.log10(np.abs(des2))
-    diff = np.abs(np.sum(des1 - des2))
+    diff = np.abs(np.sum(des1 - des2)) / 160.0
+    global max_diff
     return diff
-
 
 
 def hu_extract(img, point):
@@ -165,3 +170,15 @@ def hu_extract(img, point):
     return des
 
 
+if __name__ == '__main__':
+    def build_checkerboard(w, h):
+        re = np.r_[w * [0, 1]]  # even-numbered rows
+        ro = np.r_[w * [1, 0]]  # odd-numbered rows
+        return np.row_stack(h * (re, ro))
+
+
+    img1 = build_checkerboard(64, 64).astype(np.uint16) * 256
+    img2 = (np.random.rand(64, 64) * 256).astype(np.uint16)
+    des1 = hu_extract(img1, (32, 32))
+    des2 = hu_extract(img2, (32, 32))
+    print(hu_distance(des1, des2))
