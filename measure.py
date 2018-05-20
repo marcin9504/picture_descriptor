@@ -37,6 +37,5 @@ def main():
         print(y_t, y_s)
     roc_plot.draw(y_true, y_scores)
 
-
 if __name__ == '__main__':
     main()
