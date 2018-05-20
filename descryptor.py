@@ -39,7 +39,7 @@ def extract(img, points):
         # des[Descriptor.CIRCLE_HIST] = circle_hist_extract(img, point)
         # des[Descriptor.HU_MOMENTS] = hu_extract(img, point)
         # des[Descriptor.AVERAGE] = average_extract(img, point)
-        des[Descriptor.MAX_ON_CIRCLE] = max_on_circle_extract(img, point)
+        # des[Descriptor.MAX_ON_CIRCLE] = max_on_circle_extract(img, point)
         des[Descriptor.BRIEF] = brief.extract(img, point)
         descryptors.append(des)
     return descryptors
@@ -84,7 +84,7 @@ def max_on_circle_extract(img, point):
     des = [0 for _ in range(len(dict_brightness))]
     for key, value in dict_brightness.items():
         des[key - 1] = value[0]
-    return des
+    return des[:32]
 
 
 def max_on_circle_distance(des1, des2):
@@ -140,7 +140,7 @@ def circle_hist_extract(img, point):
     des = np.zeros(len(dict_brightness))
     for key, value in normalise_count.items():
         des[key] = dict_brightness[key] / value
-    return des
+    return des[:32]
 
 
 def rescale(vector, length):
