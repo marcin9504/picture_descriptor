@@ -1,13 +1,11 @@
+import os
 import random
 
 import cv2
 import numpy as np
 
-import roc_plot
-from image_transformaer import ImageTransformer
-import os
-
 import descryptor
+from image_transformaer import ImageTransformer
 
 SAMPLE_SIZE = 128
 SAMPLES_NUM = 200
@@ -89,16 +87,16 @@ def main():
     orginal = random_sample(img, SAMPLE_SIZE)
     for rot in range(0, 91, 10):
         orginal_samples.append(rotate(orginal, rot))
-    # for rot in range(0, 55, 7):
-    #     orginal_samples.append(view_point(orginal, rot))
-    # for kernel_size in range(5, 21, 4):
-    #     orginal_samples.append(blur(orginal, kernel_size))
-    # for scale in [0.5, 0.7, 0.8, 1.2, 1.5, 2, 3, 4, 5]:
-    #     orginal_samples.append(zoom(orginal, scale))
-    # for g in [0.5, 0.6, 0.75, 1.2, 1.5, 1.7]:
-    #     orginal_samples.append(gamma(orginal, g))
-    # for quality in [5, 10, 30, 55, 80]:
-    #     orginal_samples.append(jpg_compress(orginal, quality))
+    for rot in range(0, 55, 7):
+        orginal_samples.append(view_point(orginal, rot))
+    for kernel_size in range(5, 21, 4):
+        orginal_samples.append(blur(orginal, kernel_size))
+    for scale in [0.5, 0.7, 0.8, 1.2, 1.5, 2, 3, 4, 5]:
+        orginal_samples.append(zoom(orginal, scale))
+    for g in [0.5, 0.6, 0.75, 1.2, 1.5, 1.7]:
+        orginal_samples.append(gamma(orginal, g))
+    for quality in [5, 10, 30, 55, 80]:
+        orginal_samples.append(jpg_compress(orginal, quality))
     sets = [
         ('bikes', 'ppm'),
         ('bark', 'ppm'),
@@ -128,9 +126,9 @@ def main():
     for sample in orginal_samples:
         sample_center = [[int(sample.shape[0] / 2)] * 2]
         des.append(descryptor.extract(sample, sample_center)[0])
-    # for sample in other_samples:
-    #     sample_center = [[int(sample.shape[0] / 2)] * 2]
-    #     des.append(descryptor.extract(sample, sample_center)[0])
+    for sample in other_samples:
+        sample_center = [[int(sample.shape[0] / 2)] * 2]
+        des.append(descryptor.extract(sample, sample_center)[0])
     for i, d1 in enumerate(des):
         for j, d2 in enumerate(des):
             if i < len(des) / 2 and j < len(des) / 2:
@@ -139,10 +137,10 @@ def main():
                 y_true.append(1)
             y_score.append(descryptor.distance(d1, d2))
             # print(f'\r {i*len(des)+j} out of {len(des)**2}', end='')
-    print()
+    print(y_score)
     # for y_t, y_s in zip(y_true, y_score):
     #     print(y_t, y_s)
-    roc_plot.draw(y_true, y_score)
+    # roc_plot.draw(y_true, y_score)
 
 
 if __name__ == '__main__':
