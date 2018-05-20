@@ -38,7 +38,8 @@ class Brief(object):
 if __name__ == '__main__':
     b = Brief(512, 32)
     import matplotlib.pyplot as plt
-    plt.scatter(b.points[:, 0], b.points[:, 1])
+    ax = plt.subplot(111, aspect='equal')
+    ax.scatter(b.points[:, 0], b.points[:, 1])
     plt.show()
     img = cv2.imread('tmp.jpg')
     b.extract(img, (32, 32))
