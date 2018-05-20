@@ -122,24 +122,20 @@ Dla każdego z współczynników: $\alpha = 0, \frac{\pi}{36}, \frac{2\pi}{36},.
 
 \subsection{Porównanie jasności punktów}
 \subsubsection{Ekstrakcja}
-Metoda opiera się na algorytmie BRIEF z modyfikacjami. Przy inicjacji algorytmu jest losowancyh 512 punktów należących do okręgu o wielkości rozważanego deskryptora z jednostajnym prawdopodobieństwem.
+Metoda opiera się na algorytmie BRIEF z modyfikacjami. Przy inicjacji algorytmu jest losowanych 512 punktów należących do okręgu o wielkości rozważanego deskryptora z jednostajnym prawdopodobieństwem.
 
-\includegraphics[width=0.7\textwidth]{./img/points.png}
+%\includegraphics[width=0.7\textwidth]{./img/points.png}
 
 Dla otoczenia punktu jest obliczany kąt oraz długość gradientu dla każdego z piksela. Używany jest do tego pionowy i poziomy filtr Sobela -- $g_x$ oraz $g_y$, a następnie gradient jest obliczany ze wzoru:
 
 $$ g = \sqrt{g_x^2 + g_y^2}$$
 $$ \theta =arctan \frac{g_y}{g_x}$$
 
-Z wyliczonych wartości jest obliczany dominujący gradient z kątów $\theta$ przy pomocy średniej wazonej z wagami $g$. Nastepnie obraz jest obracany wg tego gradientu. W kolejnymkorku są porównywane jasności punktów parami. Jeżeli jasność pierwszegopunktu jest większa niż drugiego to do deskryptora jest zapisywana wartość 1, 0 w przeciwnym przypadku. Lista 0 i 1 tworzy deskryptor.
+Z wyliczonych wartości jest obliczany dominujący gradient z kątów $\theta$ przy pomocy średniej ważonej z wagami $g$. Następnie obraz jest obracany wg tego gradientu. W kolejnym kroku są porównywane jasności punktów parami. Jeżeli jasność pierwszego punktu jest większa niż drugiego to do deskryptora jest zapisywana wartość 1, 0 w przeciwnym przypadku. Lista 0 i 1 tworzy deskryptor.
 
-\section{Porównanie}
-
-Porównanie deskryptorówpolega na obliczenieniu ich odległości Hamminga.
 
 \subsection{Porównanie}
-Porównywanie obrazów odbywa się przy pomocy odległości Hamminga.
-
+Porównywanie deskryptorów odbywa się przy pomocy odległości Hamminga.
 
 \subsubsection{Wynik działania}
 
@@ -159,5 +155,17 @@ Aby móc dobrze ocenić działanie deskryptora zostały napisane dwa skrypty umo
 \item powiększeniu,
 \item kompresji jpg.
 \end{enumerate}
+
+\section{Podsumowanie}
+Zostały przetestowane również deskryptory, które łączyły ze sobą różne metody.
+Najlepszym połączeniem okazało się być połączenie: średniej jasności otoczenia i porównania jasności punktów.
+Jako zwracaną odległość ustalono średnią arytmetyczną z wartości zwracanych przez funkcje porównujące powyższe deskryptory.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{./img/average_and_brief.png}
+\end{center}
+\caption{Wynik działania deskryptora, AUC.}
+\end{figure}
 
 \end{document}  
