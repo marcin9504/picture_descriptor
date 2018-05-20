@@ -73,7 +73,7 @@ def max_on_circle_extract(img, point):
     des = [0 for _ in range(len(dict_brightness))]
     for key, value in dict_brightness.items():
         des[key - 1] = value[0]
-    return des
+    return des[:32]
 
 
 def max_on_circle_distance(des1, des2):
@@ -92,10 +92,10 @@ def max_on_circle_distance(des1, des2):
             des1 = tmp_v
             corr.append(abs(pearsonr(des1[:rescaled_length], rescale(des2, rescaled_length))[0]))
             corr.append(abs(pearsonr(des2[:rescaled_length], rescale(des1, rescaled_length))[0]))
-    if np.isnan(np.min(corr)):
+    if np.isnan(np.max(corr)):
         return 0.5
     else:
-        return np.min(corr)
+        return 1-np.max(corr)
 
 
 def average_extract(img, point):
@@ -146,7 +146,7 @@ def circle_hist_distance(des1, des2):
         rescaled_length = math.floor(len(des1) * scale)
         corr.append(abs(pearsonr(des1[:rescaled_length], rescale(des2, rescaled_length))[0]))
         corr.append(abs(pearsonr(des2[:rescaled_length], rescale(des1, rescaled_length))[0]))
-    return max(corr)
+    return 1-max(corr)
 
 
 def hu_distance(des1, des2):
