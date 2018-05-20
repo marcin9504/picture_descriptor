@@ -6,16 +6,7 @@ import numpy as np
 from scipy.stats.stats import pearsonr
 
 from brief import Brief
-
-
-def cut_circle(img):
-    w, h = img.shape
-    a, b = w / 2, h / 2
-    n = min(w, h)
-    y, x = np.ogrid[-a:n - a, -b:n - b]
-    mask = x * x + y * y <= n * n / 4
-    img[~mask] = 0
-    return img
+from util import get_sample
 
 
 class Descriptor(dict):
@@ -25,10 +16,11 @@ class Descriptor(dict):
     MAX_ON_CIRCLE = 'max_on_circle'
     BRIEF = 'brief'
 
+
 brief = None
 
+
 def extract(img, points):
-    # return circle_hist_extract(img, points) #uncomment it to use only one method
     global brief
     if brief is None:
         brief = Brief(512, 32)
@@ -46,13 +38,12 @@ def extract(img, points):
 
 
 def distance(des1, des2):
-    # return circle_hist_distance(des1,des2) #uncomment it to use only one method
     scores = []
     # scores.append(circle_hist_distance(des1[Descriptor.CIRCLE_HIST], des2[Descriptor.CIRCLE_HIST]))
     # scores.append(hu_distance(des1[Descriptor.HU_MOMENTS], des2[Descriptor.HU_MOMENTS]))
     # scores.append(average_distance(des1[Descriptor.AVERAGE], des2[Descriptor.AVERAGE]))
     # scores.append(max_on_circle_distance(des1[Descriptor.MAX_ON_CIRCLE], des2[Descriptor.MAX_ON_CIRCLE]))
-    scores.append(Brief.compare(des1[Descriptor.BRIEF], des2[Descriptor.BRIEF]))
+    scores.append(brief.compare(des1[Descriptor.BRIEF], des2[Descriptor.BRIEF]))
     # for idx, d in enumerate(scores):
     #     if d not in range(0, 1):
     #         scores[idx] = 0.5
@@ -152,7 +143,6 @@ def rescale(vector, length):
 
 
 def circle_hist_distance(des1, des2):
-    # return abs(pearsonr(des1, des2)[0])
     corr = []
     for scale in (0.7, 0.8, 0.9, 1, 0.5, 0.6, 0.25):
         rescaled_length = math.floor(len(des1) * scale)
@@ -161,12 +151,15 @@ def circle_hist_distance(des1, des2):
     return 1-max(corr)
 
 
+max_diff = 0
+
+
 def hu_distance(des1, des2):
     des1 = -np.sign(des1) * np.log10(np.abs(des1))
     des2 = -np.sign(des2) * np.log10(np.abs(des2))
-    diff = np.abs(np.sum(des1 - des2))
+    diff = np.abs(np.sum(des1 - des2)) / 160.0
+    global max_diff
     return diff
-
 
 
 def hu_extract(img, point):
@@ -177,24 +170,15 @@ def hu_extract(img, point):
     return des
 
 
-def normalise_image(img):
-    return cv2.normalize(img, None, 0, 255, cv2.NORM_MINMAX)
+if __name__ == '__main__':
+    def build_checkerboard(w, h):
+        re = np.r_[w * [0, 1]]  # even-numbered rows
+        ro = np.r_[w * [1, 0]]  # odd-numbered rows
+        return np.row_stack(h * (re, ro))
 
 
-def get_sample(img, x, y, r=32, normalize=True):
-    sample = img[y - r:y + r, x - r:x + r]
-    sample = cut_circle(sample)
-    if normalize:
-        sample = normalise_image(sample)
-    return sample
-
-
-def sign(x):
-    if x > 0:
-        return 1.
-    elif x < 0:
-        return -1.
-    elif x == 0:
-        return 0.
-    else:
-        return x
+    img1 = build_checkerboard(64, 64).astype(np.uint16) * 256
+    img2 = (np.random.rand(64, 64) * 256).astype(np.uint16)
+    des1 = hu_extract(img1, (32, 32))
+    des2 = hu_extract(img2, (32, 32))
+    print(hu_distance(des1, des2))
