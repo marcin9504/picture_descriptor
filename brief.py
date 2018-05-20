@@ -88,3 +88,4 @@ if __name__ == '__main__':
     img = cv2.imread('rotated.png')
     des2 = b.extract(img, (32, 32))
     print(b.compare(des1, des2))
+   
