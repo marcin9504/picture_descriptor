@@ -52,7 +52,6 @@ def distance(des1, des2):
 
 
 def max_on_circle_extract(img, point):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     y, x = point
     sample = get_sample(img, x, y)
     w, h = sample.shape
@@ -101,7 +100,6 @@ def max_on_circle_distance(des1, des2):
 
 
 def average_extract(img, point):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     y, x = point
     sample = get_sample(img, x, y)
     des = np.average(sample)
@@ -114,7 +112,6 @@ def average_distance(des1, des2):
 
 
 def circle_hist_extract(img, point):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     y, x = point
     sample = get_sample(img, x, y)
     w, h = sample.shape
@@ -163,7 +160,7 @@ def hu_distance(des1, des2):
 
 
 def hu_extract(img, point):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)/256
+    img = img/256
     y, x = point
     sample = get_sample(img, x, y)
     des = cv2.HuMoments(cv2.moments(sample))

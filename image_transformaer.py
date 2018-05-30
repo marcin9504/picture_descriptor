@@ -35,7 +35,7 @@ class ImageTransformer(object):
         self.image = image
         self.height = self.image.shape[0]
         self.width = self.image.shape[1]
-        self.num_channels = self.image.shape[2]
+        self.num_channels = 1
 
     """ Wrapper of Rotating a Image """
 

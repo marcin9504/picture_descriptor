@@ -21,12 +21,16 @@ def main():
     images = {}
     for idx, point in points.iterrows():
         if (point['set'], point['file']) not in images:
-            images[(point['set'], point['file'])] = (cv2.imread(os.path.join(point['set'], point['file'])))
+            img = cv2.imread(os.path.join(point['set'], point['file']))
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            images[(point['set'], point['file'])] = img
     descriptors = []
     for idx, point in points.iterrows():
         x = point['pos']['x']
         y = point['pos']['y']
-        descriptors.extend(descriptor.extract(images[(point['set'], point['file'])], [[y, x]]))
+        img = images[(point['set'], point['file'])]
+        descriptors.extend(descriptor.extract(img, [[y, x]]))
+
     y_scores = []
     y_true = []
     for i, des1 in enumerate(descriptors):

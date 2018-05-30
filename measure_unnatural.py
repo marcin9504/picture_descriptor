@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 
 import descriptor
+import roc_plot
 from image_transformaer import ImageTransformer
 
 SAMPLE_SIZE = 128
@@ -12,7 +13,7 @@ SAMPLES_NUM = 200
 
 
 def random_sample(img, size):
-    rows, cols, _ = img.shape
+    rows, cols = img.shape
     y, x = random.randint(size / 2, rows - size / 2), \
            random.randint(size / 2, cols - size / 2)
 
@@ -29,7 +30,7 @@ def blur(img, kernel_size):
 
 
 def rotate(img, angle):
-    w, h, _ = img.shape
+    w, h = img.shape
     rot_mat = cv2.getRotationMatrix2D((h / 2, w / 2), angle, 1.0)
     img = cv2.warpAffine(img, rot_mat, (h, w), flags=cv2.INTER_LINEAR)
     return img
@@ -41,7 +42,7 @@ def jpg_compress(img, quality):
 
 
 def zoom(img, scale):
-    w, h, _ = img.shape
+    w, h = img.shape
     return cv2.resize(img, (int(scale * h), int(scale * w)), interpolation=cv2.INTER_CUBIC)
 
 
@@ -67,12 +68,13 @@ def random_transformation(img):
              (jpg_compress, [5, 10, 30, 55, 80])
              ]
     f, val = random.choice(trans)
-    return f(img, random.choice(val))
+    img = f(img, random.choice(val))
+    return img
 
 
 def save_samples(samples):
     for i, sample in enumerate(samples):
-        w, h, _ = sample.shape
+        w, h = sample.shape
         sample = sample[int((w - SAMPLE_SIZE) / 2):int(w - (w - SAMPLE_SIZE) / 2),
                  int((h - SAMPLE_SIZE) / 2):int(h - (h - SAMPLE_SIZE) / 2)]
         cv2.imwrite(os.path.join('samples', f'{i}.png'), sample)
@@ -84,6 +86,7 @@ def main():
     orginal_set = 'bikes'
     img = cv2.imread(os.path.join(orginal_set, 'img1.ppm'))
     orginal_samples = []
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     orginal = random_sample(img, SAMPLE_SIZE)
     for rot in range(0, 91, 10):
         orginal_samples.append(rotate(orginal, rot))
@@ -111,13 +114,20 @@ def main():
     images = [f'img{i+1}' for i in range(6)]
     other_samples = []
     for _ in range(len(orginal_samples)):
-        rand_set = random.choice(sets)
+        # rand_set = random.choice(sets)
         rand_set = used_set
         rand_img = random.choice(images)
         rand_img = cv2.imread(os.path.join(rand_set[0], f'{rand_img}.{rand_set[1]}'))
+        rand_img = cv2.cvtColor(rand_img, cv2.COLOR_BGR2GRAY)
         rand_img = random_sample(rand_img, SAMPLE_SIZE)
         rand_img = random_transformation(rand_img)
         other_samples.append(rand_img)
+    for idx, sample in enumerate(orginal_samples):
+        if len(sample.shape) == 3:
+            orginal_samples[idx] = cv2.cvtColor(sample, cv2.COLOR_BGR2GRAY)
+    for idx, sample in enumerate(other_samples):
+        if len(sample.shape) == 3:
+            other_samples[idx] = cv2.cvtColor(sample, cv2.COLOR_BGR2GRAY)
     save_samples(orginal_samples + other_samples)
 
     y_true = []
@@ -140,7 +150,7 @@ def main():
     print(y_score)
     # for y_t, y_s in zip(y_true, y_score):
     #     print(y_t, y_s)
-    # roc_plot.draw(y_true, y_score)
+    roc_plot.draw(y_true, y_score)
 
 
 if __name__ == '__main__':
