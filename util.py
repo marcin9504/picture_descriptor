@@ -47,7 +47,7 @@ def cut_circle(img):
     if len(img.shape) == 3:
         w, h, _ = img.shape
     else:
-        w, h  = img.shape
+        w, h = img.shape
     a, b = w / 2, h / 2
     r = min(w, h)
     y, x = np.ogrid[-a:r - a, -b:r - b]

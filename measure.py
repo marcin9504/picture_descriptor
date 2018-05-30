@@ -13,11 +13,10 @@ def get_file_name(file):
 
 
 def main():
-    random.seed(3)
     all_points = pd.read_json('points.json')
     img_class = random.choice(all_points['class'].unique())
     points = all_points[all_points['class'] == img_class]
-    points = points.append(all_points[all_points['class'] != img_class].sample(30))
+    points = points.append(all_points[all_points['class'] != img_class].sample(6))
     images = {}
     for idx, point in points.iterrows():
         if (point['set'], point['file']) not in images:
