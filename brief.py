@@ -26,7 +26,7 @@ class Brief(object):
     def extract(self, img, point):
         y, x = point
         # hist = self.circle_hist_extract(img, point)
-        img = get_sample(img, y, x, normalize=False)
+        img = get_sample(img, x, y, normalize=False)
         angle = self.extract_dominant_gradient(img)
         img = rotate(img, angle)
         y = x = 32
